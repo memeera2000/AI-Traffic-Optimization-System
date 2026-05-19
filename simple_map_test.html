@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Map Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { 
+            width: 100vw; 
+            height: 100vh; 
+            background: yellow;
+        }
+        .info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border: 2px solid black;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h3>Simple Map Test</h3>
+        <div>If you see yellow background, container works</div>
+        <div>If you see a map, Leaflet works</div>
+    </div>
+    <div id="map"></div>
+    
+    <script>
+        console.log('Starting simple map test...');
+        
+        // Initialize map
+        var map = L.map('map').setView([20.5937, 78.9629], 5);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Add a marker
+        L.marker([20.5937, 78.9629]).addTo(map)
+            .bindPopup('Test marker - Map is working!')
+            .openPopup();
+            
+        console.log('Simple map test completed');
+    </script>
+</body>
+</html>

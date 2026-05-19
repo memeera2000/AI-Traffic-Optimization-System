@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Route Debug Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div id="map" style="height: 400px; width: 100%;"></div>
+    <div style="padding: 20px;">
+        <button onclick="testBasicMap()">Test Basic Map</button>
+        <button onclick="testRouteAPI()">Test Route API</button>
+        <button onclick="testRouteDisplay()">Test Route Display</button>
+        <div id="output" style="margin-top: 20px; background: #f0f0f0; padding: 10px; border-radius: 5px;"></div>
+    </div>
+
+    <script>
+        let map, testRoute;
+        
+        // Initialize map
+        map = L.map('map').setView([28.6139, 77.2090], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        function log(message) {
+            document.getElementById('output').innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            console.log(message);
+        }
+        
+        function testBasicMap() {
+            log('Testing basic map functionality...');
+            try {
+                const marker = L.marker([28.6139, 77.2090]).addTo(map);
+                log('✅ Basic map test successful - marker added');
+                setTimeout(() => map.removeLayer(marker), 2000);
+            } catch (error) {
+                log('❌ Basic map test failed: ' + error.message);
+            }
+        }
+        
+        async function testRouteAPI() {
+            log('Testing OSRM API...');
+            try {
+                const coords = '77.2090,28.6139;77.3000,28.7000?overview=full&geometries=geojson&alternatives=1';
+                const url = 'https://router.project-osrm.org/route/v1/driving/' + coords;
+                
+                log('Fetching from: ' + url);
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                    log('✅ API test successful - got ' + data.routes.length + ' routes');
+                    log('Route 1 distance: ' + Math.round(data.routes[0].distance/1000) + 'km');
+                    log('Route 1 geometry points: ' + data.routes[0].geometry.coordinates.length);
+                    testRoute = data.routes[0];
+                } else {
+                    log('❌ API returned error: ' + data.code);
+                }
+            } catch (error) {
+                log('❌ API test failed: ' + error.message);
+            }
+        }
+        
+        function testRouteDisplay() {
+            if (!testRoute) {
+                log('❌ No route data available. Run API test first.');
+                return;
+            }
+            
+            log('Testing route display...');
+            try {
+                // Convert coordinates from [lon, lat] to [lat, lon]
+                const coords = testRoute.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                log('Converting ' + coords.length + ' coordinates...');
+                
+                // Create polyline
+                const routeLine = L.polyline(coords, {
+                    color: '#00d4ff',
+                    weight: 6,
+                    opacity: 0.9
+                }).addTo(map);
+                
+                // Fit map to route
+                map.fitBounds(routeLine.getBounds());
+                
+                log('✅ Route display successful');
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    map.removeLayer(routeLine);
+                    log('Route removed');
+                }, 5000);
+                
+            } catch (error) {
+                log('❌ Route display failed: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

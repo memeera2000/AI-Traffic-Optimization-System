@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map Display Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { 
+            width: 100vw; 
+            height: 100vh; 
+            background: red; /* Red background to see if div is visible */
+        }
+        .test-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border: 1px solid black;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <div>Map Container Test</div>
+        <div id="status">Loading...</div>
+    </div>
+    <div id="map"></div>
+    
+    <script>
+        function updateStatus(msg) {
+            document.getElementById('status').textContent = msg;
+            console.log(msg);
+        }
+        
+        try {
+            updateStatus('Checking Leaflet...');
+            if (typeof L === 'undefined') {
+                updateStatus('ERROR: Leaflet not loaded!');
+                return;
+            }
+            
+            updateStatus('Leaflet OK, checking map container...');
+            var mapEl = document.getElementById('map');
+            if (!mapEl) {
+                updateStatus('ERROR: Map element not found!');
+                return;
+            }
+            
+            updateStatus('Container OK, initializing map...');
+            var map = L.map('map').setView([28.6139, 77.2090], 10);
+            
+            updateStatus('Map initialized, adding tiles...');
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            updateStatus('SUCCESS: Map should be visible!');
+            
+        } catch (error) {
+            updateStatus('ERROR: ' + error.message);
+            console.error('Map test error:', error);
+        }
+    </script>
+</body>
+</html>

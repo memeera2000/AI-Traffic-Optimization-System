@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Route Functionality Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Route Functionality Test Results</h1>
+    <div id="results"></div>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        // Test if the main application loads correctly
+        fetch('http://127.0.0.1:3001/route-finder.html')
+            .then(response => {
+                if (response.ok) {
+                    addResult('✅ Main application loads successfully', 'success');
+                    return response.text();
+                } else {
+                    throw new Error('Failed to load: ' + response.status);
+                }
+            })
+            .then(html => {
+                // Check for key components
+                if (html.includes('showRouteOnMap')) {
+                    addResult('✅ showRouteOnMap function found', 'success');
+                } else {
+                    addResult('❌ showRouteOnMap function missing', 'error');
+                }
+                
+                if (html.includes('showAltRoutes')) {
+                    addResult('✅ showAltRoutes function found', 'success');
+                } else {
+                    addResult('❌ showAltRoutes function missing', 'error');
+                }
+                
+                if (html.includes('alt-routes')) {
+                    addResult('✅ Alternative routes container found', 'success');
+                } else {
+                    addResult('❌ Alternative routes container missing', 'error');
+                }
+                
+                if (html.includes('addEventListener') && html.includes('click')) {
+                    addResult('✅ Click event handlers found', 'success');
+                } else {
+                    addResult('❌ Click event handlers missing', 'error');
+                }
+                
+                // Check if debug panel was removed
+                if (!html.includes('debugPanel')) {
+                    addResult('✅ Debug panel successfully removed', 'success');
+                } else {
+                    addResult('⚠️ Debug panel still present', 'error');
+                }
+                
+                addResult('📋 Test completed. Check the main application at http://127.0.0.1:3001', 'info');
+            })
+            .catch(error => {
+                addResult('❌ Error loading application: ' + error.message, 'error');
+            });
+    </script>
+</body>
+</html>

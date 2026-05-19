@@ -1,0 +1,21 @@
+# --- BACKEND RUNTIME & FRAMEWORKS ---
+node >= 16.0.0
+express >= 4.19.2
+cors >= 2.8.5
+
+# --- DATABASE & DATA PERSISTENCE ---
+sqlite3 >= 5.1.7
+
+# --- SECURITY & LIFECYCLE AUTH ---
+jsonwebtoken >= 9.0.2
+bcryptjs >= 2.4.3
+express-rate-limit >= 7.2.0
+dotenv >= 16.4.5
+
+# --- FRONTEND INTERFACE & MAP APIS (CDN / BROWSER NATIVE) ---
+react >= 16.8.0
+leaflet >= 1.9.4
+osrm-backend-api (Open Source Routing Machine)
+nominatim-geocoding-api
+web-speech-api (Native Browser Hardware)
+geolocation-api (Native Browser Hardware)

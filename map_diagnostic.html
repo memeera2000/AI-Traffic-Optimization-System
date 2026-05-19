@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map Diagnostic</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: Arial, sans-serif;
+        }
+        
+        #diagnostic {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 15px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            z-index: 10000;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        #map { 
+            width: 100vw; 
+            height: 100vh; 
+            background: #e0e0e0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        .status { 
+            margin: 5px 0; 
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div id="diagnostic">
+        <h3>🔍 Map Diagnostic</h3>
+        <div id="status">Starting diagnostic...</div>
+    </div>
+    <div id="map"></div>
+    
+    <script>
+        function addStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            statusDiv.appendChild(div);
+            console.log(message);
+        }
+        
+        try {
+            addStatus('🔍 Checking environment...', 'info');
+            
+            // Check Leaflet
+            if (typeof L === 'undefined') {
+                addStatus('❌ Leaflet library not loaded!', 'error');
+                throw new Error('Leaflet not available');
+            }
+            addStatus('✅ Leaflet library loaded successfully', 'success');
+            
+            // Check map container
+            const mapEl = document.getElementById('map');
+            if (!mapEl) {
+                addStatus('❌ Map container not found!', 'error');
+                throw new Error('Map container missing');
+            }
+            
+            addStatus(`✅ Map container found (${mapEl.offsetWidth}x${mapEl.offsetHeight})`, 'success');
+            
+            // Initialize map
+            addStatus('🗺️ Initializing Leaflet map...', 'info');
+            const map = L.map('map', {
+                center: [28.6139, 77.2090], // Delhi coordinates
+                zoom: 10,
+                zoomControl: true
+            });
+            
+            addStatus('✅ Leaflet map object created', 'success');
+            
+            // Add tile layer
+            addStatus('🌍 Loading map tiles...', 'info');
+            const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            });
+            
+            tileLayer.addTo(map);
+            addStatus('✅ Tile layer added to map', 'success');
+            
+            // Add a test marker
+            const marker = L.marker([28.6139, 77.2090]).addTo(map);
+            marker.bindPopup('<b>Test Marker</b><br>If you can see this, the map is working!');
+            addStatus('📍 Test marker added', 'success');
+            
+            // Test route line
+            const testRoute = [
+                [28.6139, 77.2090],
+                [28.6500, 77.2300],
+                [28.6800, 77.2500]
+            ];
+            
+            const routeLine = L.polyline(testRoute, {
+                color: '#ff0000',
+                weight: 5,
+                opacity: 0.8
+            }).addTo(map);
+            
+            addStatus('🛣️ Test route line added', 'success');
+            
+            // Final success
+            setTimeout(() => {
+                addStatus('🎉 MAP DIAGNOSTIC COMPLETE - Everything should be visible!', 'success');
+                addStatus('If you can see the map, marker, and red line, everything is working!', 'info');
+            }, 2000);
+            
+        } catch (error) {
+            addStatus(`❌ ERROR: ${error.message}`, 'error');
+            console.error('Diagnostic error:', error);
+        }
+    </script>
+</body>
+</html>
